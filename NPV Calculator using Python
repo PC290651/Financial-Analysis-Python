@@ -1,61 +1,19 @@
-{
-  "nbformat": 4,
-  "nbformat_minor": 0,
-  "metadata": {
-    "colab": {
-      "provenance": [],
-      "authorship_tag": "ABX9TyO/1kqGznncc/LJqUvdipyD"
-    },
-    "kernelspec": {
-      "name": "python3",
-      "display_name": "Python 3"
-    },
-    "language_info": {
-      "name": "python"
-    }
-  },
-  "cells": [
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "metadata": {
-        "id": "xB9UiiUmmv8H"
-      },
-      "outputs": [],
-      "source": [
-        "# Ask the user to input the initial investment amount\n",
-        "initial = float(input(\"Enter initial investment (₹): \"))\n",
-        "\n",
-        "# Ask the user to input the discount rate and convert percentage to decimal\n",
-        "rate = float(input(\"Enter discount rate (%): \")) / 100\n",
-        "\n",
-        "# Ask the user for the number of years of future cash flows\n",
-        "years = int(input(\"Enter number of years: \"))\n",
-        "\n",
-        "# Initialize an empty list to store cash flows for each year\n",
-        "cash_flows = []\n",
-        "\n",
-        "# Loop to collect cash flow for each year from the user\n",
-        "for i in range(1, years + 1):\n",
-        "    cf = float(input(f\"Year {i} cash flow (₹): \"))\n",
-        "    cash_flows.append(cf)\n",
-        "\n",
-        "# Calculate the Net Present Value (NPV)\n",
-        "# Each cash flow is discounted to present value using the formula: CF / (1 + rate)^(year)\n",
-        "# Subtract the initial investment from the total present value of cash flows\n",
-        "npv = sum(cf / (1 + rate) ** (i + 1) for i, cf in enumerate(cash_flows)) - initial\n",
-        "\n",
-        "# Display the final NPV rounded to 2 decimal places\n",
-        "print(\"\\nNet Present Value (NPV) is ₹\", round(npv, 2))\n",
-        "\n",
-        "# Decision rule based on the sign of NPV\n",
-        "if npv > 0:\n",
-        "    print(\"✅ Project is profitable — Accept the project.\")\n",
-        "elif npv < 0:\n",
-        "    print(\"❌ Project will incur a loss - Reject the project.\")\n",
-        "else:\n",
-        "    print(\"NPV is zero — Break-even. Accept only if non-financial benefits exist.\")"
-      ]
-    }
-  ]
-}
+initial = float(input("Enter initial investment (₹): "))
+rate = float(input("Enter discount rate (%): ")) / 100
+years = int(input("Enter number of years: "))
+
+cash_flows = []
+for i in range(1, years + 1):
+    cf = float(input(f"Year {i} cash flow (₹): "))
+    cash_flows.append(cf)
+
+npv = sum(cf / (1 + rate) ** (i + 1) for i, cf in enumerate(cash_flows)) - initial
+
+print("\nNet Present Value (NPV) is ₹", round(npv, 2))
+
+if npv > 0:
+    print("✅ Project is profitable — Accept the project.")
+elif npv < 0:
+    print("❌ Project will incur a loss - Reject the project.")
+else:
+    print("⚖️ NPV is zero — Break-even. Accept only if non-financial benefits exist.")
