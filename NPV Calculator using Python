@@ -12,8 +12,8 @@ npv = sum(cf / (1 + rate) ** (i + 1) for i, cf in enumerate(cash_flows)) - initi
 print("\nNet Present Value (NPV) is ₹", round(npv, 2))
 
 if npv > 0:
-    print("✅ Project is profitable — Accept the project.")
+    print("Project is profitable — Accept the project.")
 elif npv < 0:
-    print("❌ Project will incur a loss - Reject the project.")
+    print("Project will incur a loss - Reject the project.")
 else:
-    print("⚖️ NPV is zero — Break-even. Accept only if non-financial benefits exist.")
+    print("NPV is zero — Break-even. Accept only if non-financial benefits exist.")
