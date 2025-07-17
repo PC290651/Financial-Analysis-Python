@@ -1,0 +1,71 @@
+import yfinance as yf
+import pandas as pd
+import datetime
+
+# Your stock portfolio
+portfolio = {
+    'TATASTEEL.NS': {'shares': 50, 'buy_price': 100},
+    'RELIANCE.NS': {'shares': 10, 'buy_price': 2300},
+    'INFY.NS': {'shares': 20, 'buy_price': 1300}
+}
+
+# Get today's date
+today = datetime.datetime.today().strftime('%Y-%m-%d')
+
+# Create an empty list to store results
+results = []
+
+# Loop through each stock in your portfolio
+for ticker in portfolio:
+    info = portfolio[ticker]
+    shares = info['shares']
+    buy_price = info['buy_price']
+
+    # Get current stock price
+    stock = yf.Ticker(ticker)
+    price_data = stock.history(period="1d")
+    current_price = price_data['Close'].iloc[-1]
+
+    # Calculate values
+    invested = shares * buy_price
+    current_value = shares * current_price
+    profit_loss = current_value - invested
+    returns = (profit_loss / invested) * 100
+
+    # Add results to the list
+    results.append({
+        'Date': today,
+        'Ticker': ticker,
+        'Shares': shares,
+        'Buy Price': buy_price,
+        'Current Price': round(current_price, 2),
+        'Invested': round(invested, 2),
+        'Current Value': round(current_value, 2),
+        'Profit/Loss': round(profit_loss, 2),
+        'Returns (%)': round(returns, 2)
+    })
+
+# Convert the results to a DataFrame and save
+df = pd.DataFrame(results)
+df.to_csv('portfolio_tracker.csv', index=False)
+
+# Print the final table
+print(df)
+
+
+import matplotlib.pyplot as plt
+
+# Make sure required columns are present in the DataFrame
+assert 'Ticker' in df.columns, "'Ticker' column not found in df"
+assert 'Returns (%)' in df.columns, "'Returns (%)' column not found in df"
+
+# Create a bar chart for returns
+plt.figure(figsize=(10, 6))  # Set the size of the chart
+plt.bar(df['Ticker'], df['Returns (%)'], color='skyblue')  # Draw bars
+
+plt.title('Portfolio Returns')         # Title of the chart
+plt.ylabel('Return (%)')               # Label for y-axis
+plt.axhline(0, color='red', linestyle='--')  # Add horizontal line at 0% return
+plt.grid(axis='y')                     # Add horizontal grid lines
+plt.tight_layout()                     # Adjust layout to avoid cutting labels
+plt.show()                             # Show the chart
