@@ -1,0 +1,115 @@
+import yfinance as yf
+import pandas as pd
+
+# Define the ticker symbol for the stock (e.g., TATASTEEL.ltd.)
+ticker_symbol = 'TATASTEEL.NS'
+
+# Define the start and end dates for the historical data
+start_date = '2022-01-01'
+end_date = '2025-06-30'
+
+# Fetch the historical data
+stock_data = yf.download(ticker_symbol, start=start_date, end=end_date)
+
+# Display the first few rows of the DataFrame
+display(stock_data.head())
+
+
+
+# Check for missing values
+missing_values = stock_data.isnull().sum()
+
+# Display the number of missing values per column
+display("Missing values per column:", missing_values)
+
+# Handle missing values if necessary (e.g., fill with forward fill)
+# stock_data = stock_data.fillna(method='ffill')
+
+
+
+
+from sklearn.preprocessing import MinMaxScaler
+
+# Select the features to scale (e.g., 'Open', 'High', 'Low', 'Close', 'Volume')
+features_to_scale = ['Open', 'High', 'Low', 'Close', 'Volume']
+
+# Initialize the MinMaxScaler
+scaler = MinMaxScaler()
+
+# Fit the scaler to the selected features and transform the data
+stock_data[features_to_scale] = scaler.fit_transform(stock_data[features_to_scale])
+
+# Display the first few rows of the scaled DataFrame
+display("Scaled data:", stock_data.head())
+
+
+
+
+from sklearn.model_selection import train_test_split
+
+# Define the target variable (e.g., 'Close' price)
+target_variable = 'Close'
+
+# Create the feature set (X) and the target set (y)
+X = stock_data[features_to_scale]
+y = stock_data[target_variable]
+
+# Split the data into training and testing sets (e.g., 80% train, 20% test)
+# We use shuffle=False to maintain the time series order
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
+
+# Display the shapes of the training and testing sets
+display("X_train shape:", X_train.shape)
+display("X_test shape:", X_test.shape)
+display("y_train shape:", y_train.shape)
+display("y_test shape:", y_test.shape)
+
+
+
+
+from sklearn.linear_model import LinearRegression
+
+# Initialize the Linear Regression model
+model = LinearRegression()
+
+# Train the model using the training data
+model.fit(X_train, y_train)
+
+# Display a message indicating that the model has been trained
+display("Linear Regression model trained successfully.")
+
+
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+# Make predictions on the test data
+y_pred = model.predict(X_test)
+
+# Create dummy arrays with the same number of features as the scaler was fitted on
+dummy_test = np.zeros((len(y_test), len(features_to_scale)))
+dummy_pred = np.zeros((len(y_pred), len(features_to_scale)))
+
+# Place the actual and predicted values into the 'Close' column of the dummy arrays
+dummy_test[:, features_to_scale.index('Close')] = y_test.values.flatten()
+dummy_pred[:, features_to_scale.index('Close')] = y_pred.flatten()
+
+# Inverse transform the dummy arrays
+y_test_actual = scaler.inverse_transform(dummy_test)[:, features_to_scale.index('Close')]
+y_pred_actual = scaler.inverse_transform(dummy_pred)[:, features_to_scale.index('Close')]
+
+
+# Create a DataFrame for plotting with original dates
+predictions_df = pd.DataFrame({'Actual': y_test_actual, 'Predicted': y_pred_actual}, index=X_test.index)
+
+# Plot the actual and predicted stock prices
+plt.figure(figsize=(14, 7))
+plt.plot(predictions_df['Actual'], label='Actual Price')
+plt.plot(predictions_df['Predicted'], label='Predicted Price')
+plt.title('Stock Price Prediction')
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.legend()
+plt.show()
